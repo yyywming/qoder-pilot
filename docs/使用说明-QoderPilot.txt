@@ -1,0 +1,93 @@
+﻿Qoder Pilot 使用说明
+====================
+
+一句话：把 Qoder 账号额度变成本机 OpenAI / Anthropic 兼容接口，
+支持多账号、每日签到、用量看板，全部在本机运行。
+
+
+一、安装与启动
+--------------
+1. 双击 QoderPilot-Setup-1.0.0.exe 安装；
+   不想安装就双击 QoderPilot-portable.exe。
+   Windows 提示"未知发布者"时，点"更多信息"→"仍要运行"。
+2. 启动后会自动打开控制台（本机地址 http://127.0.0.1:8790/）。
+3. 默认面板密码：admin（登录后请到 Settings 修改）。
+
+
+二、添加 Qoder 账号
+------------------
+方式 A：OAuth 扫码（推荐）
+  Accounts → + Add account (OAuth)
+  → 选择 国内版 / 国际版
+  → Generate authorization link
+  → 浏览器打开链接，登录并授权
+  → 面板会自动出现账号
+
+方式 B：PAT
+  在 qoder.com/account/integrations 生成 Personal Access Token
+  → Accounts → Import PAT，粘贴保存
+
+方式 C：扫描本机
+  如果本机 Qoder 客户端已登录，点 Scan local credentials 可直接导入。
+
+
+三、接入 AI 客户端
+------------------
+Base URL：http://127.0.0.1:8790/v1
+
+· OpenAI 兼容（Cherry Studio / Chatbox / NextChat 等）
+  /v1/chat/completions
+· Codex CLI
+  /v1/responses
+· Claude Code / Anthropic 兼容
+  http://127.0.0.1:8790（不带 /v1），路径 /v1/messages
+
+API Key：本机使用且未设置 Key 时可以留空；
+需要局域网共享时，在面板 Settings 生成 Key 并填入客户端。
+
+模型名：填 /v1/models 返回的 id，例如 Qwen3.8-Flash。
+
+
+四、签到与额度
+--------------
+· Daily check-in：自动领取每日 Credits（每日 +100）
+· Refresh credits：刷新账号余额
+· 看板可查看账号健康、请求数、Token、缓存命中
+
+
+五、数据与安全
+--------------
+· 账号与配置保存在：%APPDATA%\Qoder Pilot
+· 服务只监听本机 127.0.0.1，数据不上传第三方
+· 请只使用本人有权操作的账号
+
+
+六、常见问题
+------------
+Q：浏览器没自动打开？
+A：手动访问 http://127.0.0.1:8790/；仍不行请重启程序。
+
+Q：面板密码忘了？
+A：删除 %APPDATA%\Qoder Pilot\accounts\settings.json 后重启，
+   密码会恢复为 admin（账号不会丢失）。
+
+Q：端口 8790 被占用？
+A：关闭占用端口的程序，或结束重复的 Qoder Pilot 进程后重启。
+
+Q：客户端返回 503 没有可用账号？
+A：账号未添加、被禁用或额度耗尽，到 Accounts 检查并启用。
+
+Q：杀毒软件报毒？
+A：程序未购买商业代码签名证书，Electron 打包容易被误报；
+   添加信任即可。
+
+Q：如何卸载？
+A：设置 → 应用 → Qoder Pilot → 卸载；
+   如需清除数据，再删除 %APPDATA%\Qoder Pilot。
+
+
+七、说明
+--------
+本工具为非官方本地网关，仅用于本人账号的技术研究；
+不提供账号或额度。自动化操作可能触发平台风控，请自行评估。
+内置引擎基于 MIT 开源项目 Qoder2API-Hub，详见 NOTICE.md。

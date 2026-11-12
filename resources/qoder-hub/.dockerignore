@@ -1,0 +1,29 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+python/
+*.bat
+*.zip
+*.bak*
+temp_*
+_acc
+_use
+.DS_Store
+
+# Team workspace / runtime state (never ship)
+.team/
+accounts/
+usage/
+logs/
+.mimosa/
+_shots/
+umid/
+
+# 本地调试环境（含 PAT 的 .env 绝不进构建上下文）
+.env
+.venv/
+_tmp_*
+.tmp_*

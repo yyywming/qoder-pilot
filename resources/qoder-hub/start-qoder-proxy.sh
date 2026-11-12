@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+# ===========================================================
+#  Qoder proxy - launcher (CN + Intl)   [Linux / macOS]
+#
+#  Usage:  ./start-qoder-proxy.sh [port]
+#
+#  Same design as start-qoder-proxy.bat: this terminal window
+#  IS the process lifetime - Ctrl+C (or closing the terminal)
+#  stops the server, no background leftovers.
+# ===========================================================
+set -u
+
+# `sh start-qoder-proxy.sh` would run this under dash, where the bash-isms
+# below fail with "Bad substitution". Hand ourselves over to bash instead.
+if [ -z "${BASH_VERSION:-}" ]; then
+    exec bash "$0" "$@"
+fi
+
+PORT="${1:-8790}"
+SRC="${BASH_SOURCE[0]:-$0}"
+HERE="$(cd -- "$(dirname -- "$SRC")" && pwd)"
+SCRIPT="$HERE/qoder_proxy.py"
+export QD_LOG_DIR="${QD_LOG_DIR:-$HERE/logs}"
+mkdir -p "$QD_LOG_DIR" || exit 1
+# Direct exec keeps signals intact; Python tees console streams to logs/.
+
+if [ ! -f "$SCRIPT" ]; then
+    echo "[ERROR] qoder_proxy.py not found next to this script."
+    echo "        expected: $SCRIPT"
+    exit 1
+fi
+
+cd "$HERE" || exit 1
+
+# A candidate is usable when it exists, is executable and is Python >= 3.9
+# (a stray python2 on PATH would otherwise be picked and fail in odd ways).
+usable() {
+    "$1" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 9) else 1)' \
+        >/dev/null 2>&1
+}
+
+# An explicit interpreter wins over auto-detection:
+#     QD_PROXY_PYTHON=/usr/bin/python3.12 ./start-qoder-proxy.sh
+PYEXE="${QD_PROXY_PYTHON:-}"
+
+if [ -n "$PYEXE" ]; then
+    if [ ! -x "$PYEXE" ] || ! usable "$PYEXE"; then
+        echo "[ERROR] QD_PROXY_PYTHON is set to '$PYEXE', but that is not"
+        echo "        an executable Python 3.9+ interpreter."
+        exit 1
+    fi
+fi
+
+# ---- 1) bundled runtime (ships with the portable package, if present) ----
+for cand in "$HERE/python/bin/python3" "$HERE/python/bin/python"; do
+    [ -n "$PYEXE" ] && break
+    if [ -x "$cand" ] && usable "$cand"; then
+        PYEXE="$cand"
+        break
+    fi
+done
+
+# ---- 2) python3 on PATH ----
+if [ -z "$PYEXE" ] && usable python3; then
+    PYEXE="python3"
+fi
+
+# ---- 3) python on PATH ----
+if [ -z "$PYEXE" ] && usable python; then
+    PYEXE="python"
+fi
+
+# ---- 4) Codex bundled runtimes (parity with the .bat fallback) ----
+if [ -z "$PYEXE" ]; then
+    for cand in "$HOME"/.cache/codex-runtimes/*/dependencies/python/bin/python3; do
+        if [ -x "$cand" ] && usable "$cand"; then
+            PYEXE="$cand"
+            break
+        fi
+    done
+fi
+
+if [ -z "$PYEXE" ]; then
+    echo "[ERROR] No usable Python found."
+    echo
+    echo "Options:"
+    echo "  1. Use the packaged bundle, which already contains python/"
+    echo "  2. Install Python 3.9+ (apt install python3 / dnf install python3)"
+    echo "  3. Or point the script at an interpreter explicitly:"
+    echo "       QD_PROXY_PYTHON=/usr/bin/python3.12 ./start-qoder-proxy.sh"
+    exit 1
+fi
+
+echo "==========================================================="
+echo "  Qoder proxy"
+echo
+echo "  API      : http://127.0.0.1:$PORT/v1"
+echo "  Dashboard: http://127.0.0.1:$PORT/"
+echo
+echo "  Python   : $PYEXE"
+echo
+echo "  Keep this terminal open. Ctrl+C stops the server."
+echo "  Or stop it from another shell:  ./stop-qoder-proxy.sh"
+echo "==========================================================="
+echo
+
+# exec (not a child process) so the server's lifetime is exactly this
+# terminal's: Ctrl+C or closing the terminal stops it, and killing the
+# launcher can never leave an orphan holding the port.
+# issue #89: write the pid file here too, so stop-qoder-proxy.sh can find us
+PIDFILE="$HERE/qoder-proxy.pid"
+
+# issue #137 后续：INTL 出口也启用「结构化工具历史」。
+#
+# 不启用时，网关会把每次工具调用改写成一段文本塞进 assistant 历史
+# （`[assistant 请求调用工具]` + JSON 数组）。模型在长会话里会照抄这段
+# 脚手架，于是整轮被判成「无法还原的协议回声」而 502（issue #72）。
+# 启用后工具调用以结构化字段直传，历史里不再出现那段文本，模型无从复述。
+#
+# 2026-11-05 在本机 intl 账号 + DeepSeek-Flash 上实测：上游返回原生
+# tool_calls、正文为空，完全接受。网关自身的默认仍只对 cn 生效，这里只
+# 改**启动器**的默认值；显式传入的环境变量优先（想关掉就设成 cn）。
+# 网关默认只对 cn 生效。要在 intl 也启用（能根治「模型复述脚手架」类 502），
+# 取消下面一行的注释 —— 上行是 opt-in，不替用户改默认值：
+# export QD_STRUCTURED_TOOL_HISTORY_REALMS="cn,intl"
+
+exec "$PYEXE" "$SCRIPT" --port "$PORT" --pid-file "$PIDFILE"

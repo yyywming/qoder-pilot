@@ -1,0 +1,82 @@
+{
+  "name": "qoder-pilot",
+  "productName": "Qoder Pilot",
+  "version": "1.0.0",
+  "description": "Qoder 多账号 OpenAI / Anthropic 网关（本地运行）",
+  "main": "main.js",
+  "author": "yyywming",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^37.6.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.yyywming.qoderpilot",
+    "productName": "Qoder Pilot",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "build/icon.ico"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/qoder-hub",
+        "to": "qoder-hub"
+      },
+      {
+        "from": "resources/python",
+        "to": "python"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "signtoolOptions": {
+        "certificateFile": "certs/qoderpilot-signing.pfx",
+        "certificatePassword": "WBPilotSign2026!",
+        "signingHashAlgorithms": [
+          "sha256"
+        ],
+        "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+      }
+    },
+    "portable": {
+      "artifactName": "QoderPilot-portable.exe"
+    },
+    "electronDownload": {
+      "mirror": "https://npmmirror.com/mirrors/electron/"
+    },
+    "npmRebuild": false,
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Qoder Pilot",
+      "artifactName": "QoderPilot-Setup-${version}.exe",
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}
