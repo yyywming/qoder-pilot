@@ -1,0 +1,19 @@
+Qoder Pilot 1.0.0 必读（先看这个）
+=================================
+
+一、下载哪个？
+  免安装版（推荐）：QoderPilot-portable.exe —— 双击即用，不写注册表。
+  安装版：GitHub 下载
+      https://github.com/yyywming/qoder-pilot/releases/tag/v1.0.0
+      （安装包 106MB，超过蓝奏云单文件 100MB 上限，只能放 GitHub）
+
+二、本文件夹里的「安装包合并说明.txt」是历史文件，已作废，请忽略。
+
+三、首次使用
+  1. 双击 QoderPilot-portable.exe
+  2. 浏览器打开面板，默认密码 admin，登录后到设置里改掉
+  3. Accounts → + Add account (OAuth) 完成授权
+  4. 客户端 Base URL 填 http://127.0.0.1:8790/v1
+
+四、校验值（SHA-256）
+  9c296fe784702d8f545ae4ada78cd52f4c83739fb40d9f0b0e57e25f24b28ad8  QoderPilot-portable.exe
