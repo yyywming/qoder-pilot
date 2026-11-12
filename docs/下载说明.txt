@@ -1,0 +1,16 @@
+Qoder Pilot 1.0.0 下载说明
+==========================
+
+蓝奏云单文件上限 100MB，安装包 106MB 传不上去，所以这里只放免安装版：
+
+    QoderPilot-portable.exe   免安装单文件，双击即用
+    使用说明-QoderPilot.txt   使用说明
+
+需要安装版（Setup）请从这里下载：
+    https://github.com/yyywming/qoder-pilot/releases/tag/v1.0.0
+
+安装版与免安装版功能完全一致，区别只是安装版有开始菜单快捷方式和卸载项。
+
+校验值（SHA-256）：
+    9c296fe784702d8f545ae4ada78cd52f4c83739fb40d9f0b0e57e25f24b28ad8  QoderPilot-portable.exe
+    9eda3b7f9b5d720d7ccd335eacd7cc193ceb5c3b2900c1cce1c89ac82d352b68  QoderPilot-Setup-1.0.0.exe

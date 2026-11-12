@@ -2,6 +2,13 @@
 
 Qoder 多账号 OpenAI / Anthropic 本地网关（Windows 桌面版）。
 
+## 下载
+
+- GitHub Releases：https://github.com/yyywming/qoder-pilot/releases/tag/v1.0.0
+  - `QoderPilot-Setup-1.0.0.exe` 安装版
+  - `QoderPilot-portable.exe` 免安装单文件
+- 蓝奏云（国内镜像，免安装版）：https://wwbdq.lanzouq.com/b0wa72aqd 密码 `hfv9`
+
 ## 功能
 - 多账号：OAuth 设备授权、PAT 导入、本机客户端凭据扫描
 - 网关：`http://127.0.0.1:8790/v1`，兼容 OpenAI Chat Completions、Responses、Anthropic Messages
